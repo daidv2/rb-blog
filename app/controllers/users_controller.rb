@@ -4,7 +4,14 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
-    @users = User.all
+    if request.xhr?
+			# リスト取得
+			view_data  = User.page(params[:page]).per(10)
+			pagination = view_context.paginate(view_data, remote: true)
+			content    = render_to_string(partial: 'list_content', locals: { list_data: view_data })
+
+			render json: { pagination: pagination, content: content, status: 'OK' }
+		end
   end
 
   # GET /users/1
